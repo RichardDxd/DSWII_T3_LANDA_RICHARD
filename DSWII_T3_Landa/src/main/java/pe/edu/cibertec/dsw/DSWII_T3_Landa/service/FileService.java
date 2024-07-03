@@ -3,25 +3,26 @@ package pe.edu.cibertec.dsw.DSWII_T3_Landa.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 @Service
-public class FileService implements IFileService {
-    private final Path pathFolder = Paths.get("uploads");
+public class FileService {
 
-    @Override
-    public void guardarArchivo(MultipartFile archivo) throws Exception {
-        Files.copy(archivo.getInputStream(),
-                this.pathFolder.resolve(archivo.getOriginalFilename()));
-    }
+    private final String UPLOAD_DIR = "Images";
 
-    @Override
-    public void guardarArchivos(List<MultipartFile> archivosList) throws Exception {
-        for(MultipartFile archivo : archivosList){
-            this.guardarArchivo(archivo);
+    public void guardarArchivos(List<MultipartFile> multipartFiles) throws IOException {
+        for (MultipartFile file : multipartFiles) {
+            if (!file.isEmpty()) {
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(UPLOAD_DIR + File.separator + file.getOriginalFilename());
+                Files.createDirectories(path.getParent());
+                Files.write(path, bytes);
+            }
         }
     }
 }
